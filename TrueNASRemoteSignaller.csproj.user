@@ -9,15 +9,15 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="ServerConfigWindow.xaml.cs">
+    <Compile Update="Windows\ServerConfigWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="MainWindow.xaml">
+    <Page Update="Windows\MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="ServerConfigWindow.xaml">
+    <Page Update="Windows\ServerConfigWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

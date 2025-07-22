@@ -14,8 +14,9 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using TrueNASRemoteSignaller.Utilities;
 
-namespace TrueNASRemoteSignaller {
+namespace TrueNASRemoteSignaller.Models {
 	public class ServerInstance {
 		public int InstanceID { get; set; }
 		public string ServerName { get; set; }
@@ -28,7 +29,7 @@ namespace TrueNASRemoteSignaller {
 		public ServerInstance(string serverName, int instanceID = -1) {
 			ServerName = serverName;
 			if (instanceID == -1) {
-				this.InstanceID = _getNextInstanceID();
+				InstanceID = _getNextInstanceID();
 			}
 			else {
 				InstanceID = instanceID;
@@ -274,7 +275,7 @@ namespace TrueNASRemoteSignaller {
 			}
 			
 			// Check if a server instance with this ID already exists - if so, replace it with this
-			ServerInstance existingInstance = instances.FirstOrDefault(i => i.InstanceID == this.InstanceID);
+			ServerInstance existingInstance = instances.FirstOrDefault(i => i.InstanceID == InstanceID);
 			if (existingInstance != null) {
 				instances.Remove(existingInstance);
 			}
@@ -325,7 +326,7 @@ namespace TrueNASRemoteSignaller {
 		}
 
 		public void DeleteInstance() {
-			DeleteInstanceByID(this.InstanceID);
+			DeleteInstanceByID(InstanceID);
 		}
 
 	}

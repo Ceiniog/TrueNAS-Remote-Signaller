@@ -13,8 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
+using TrueNASRemoteSignaller.Models;
+using TrueNASRemoteSignaller.Utilities;
 
-namespace TrueNASRemoteSignaller {
+namespace TrueNASRemoteSignaller.Windows {
 	/// <summary>
 	/// Interaction logic for ServerConfigWindow.xaml
 	/// </summary>

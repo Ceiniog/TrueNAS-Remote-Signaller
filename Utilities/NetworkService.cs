@@ -12,8 +12,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TrueNASRemoteSignaller.Models;
 
-namespace TrueNASRemoteSignaller {
+namespace TrueNASRemoteSignaller.Utilities {
 	public class NetworkService {
 		public static string ConvertToWebSocketUrl(string url) {
 			if (string.IsNullOrWhiteSpace(url))
@@ -99,14 +100,14 @@ namespace TrueNASRemoteSignaller {
 			using var client = new UdpClient();
 			client.EnableBroadcast = true;
 
-			var broadcastIP = System.Net.IPAddress.Parse(server.BroadcastIP);
+			var broadcastIP = IPAddress.Parse(server.BroadcastIP);
 			var endpoint = new IPEndPoint(broadcastIP, 9);
 
 			client.Send(packet, packet.Length, endpoint);
 		}
 
 		public static bool IsValidIPv4(string input) {
-			return System.Net.IPAddress.TryParse(input, out IPAddress ip) &&
+			return IPAddress.TryParse(input, out IPAddress ip) &&
 				   ip.AddressFamily == AddressFamily.InterNetwork;
 		}
 

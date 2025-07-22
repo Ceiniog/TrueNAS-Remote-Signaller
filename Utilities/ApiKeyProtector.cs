@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrueNASRemoteSignaller {
+namespace TrueNASRemoteSignaller.Utilities {
 	public class ApiKeyProtector {
 		public static string Encrypt(string apiKey) {
 			if(string.IsNullOrEmpty(apiKey)) { return ""; }
