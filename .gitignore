@@ -1,3 +1,6 @@
 ﻿bin/
 .vs/
 obj/
+Properties/PublishProfiles/
+.git/
+/Properties/PublishProfiles

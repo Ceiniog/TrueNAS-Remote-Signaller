@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Windows;
@@ -22,14 +23,25 @@ namespace TrueNASRemoteSignaller.Windows {
 	public partial class MainWindow : Window {
 
 		public static ServerInstance? SelectedInstance;
+		public static string AppVersion = "0.0.0";
 		public MainWindow() {
 			InitializeComponent();
+			_assignAppVersion();
 			_initialiseValues();
 		}
 
 		private void _initialiseValues() {
 			boxControls.IsEnabled = false;
 			btnConfigureServer.IsEnabled = false;
+		}
+
+		private void _assignAppVersion() {
+			AppVersion = Assembly
+			.GetEntryAssembly()?
+			.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+			.InformationalVersion.Split('+')[0] // Exclude hash after version number
+			?? "0.0.0"; // Fallback
+			versionLbl.Content = "v" + AppVersion;
 		}
 
 		public void UpdateServerCombo(string indexSetting = "current") {
@@ -221,5 +233,16 @@ namespace TrueNASRemoteSignaller.Windows {
 				await Task.Delay(10000); // Wait 10 seconds
 			}
 		}
+
+		
+		private void Window_Activated(object sender, EventArgs e) {
+			/*
+			ServerConfigWindow? configWindow = Application.Current.Windows.OfType<ServerConfigWindow>().FirstOrDefault();
+			if (configWindow != null) {
+				configWindow.Activate();
+			}
+			*/
+		}
+		
 	}
 }

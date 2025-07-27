@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrueNASRemoteSignaller"
         mc:Ignorable="d"
-        Title="TrueNAS Remote Signaller - Server Configuration" Height="300" Width="1050" Background="#FFE9E9E9" ResizeMode="NoResize" ShowInTaskbar="False" Initialized="Window_Initialized">
+        Title="TrueNAS Remote Signaller - Server Configuration" Height="300" Width="1050" Background="#FFE9E9E9" ResizeMode="NoResize" Initialized="Window_Initialized">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="86*"/>

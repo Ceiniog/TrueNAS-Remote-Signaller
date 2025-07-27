@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrueNASRemoteSignaller"
         mc:Ignorable="d"
-        Title="TrueNAS Remote Signaller - Main Menu" Height="450" Width="650" ResizeMode="CanMinimize" Background="#FFE9E9E9" Closed="Window_Closed" ContentRendered="Window_ContentRendered">
+        Title="TrueNAS Remote Signaller - Main Menu" Height="450" Width="650" ResizeMode="CanMinimize" Background="#FFE9E9E9" Closed="Window_Closed" ContentRendered="Window_ContentRendered" Activated="Window_Activated">
     <Grid Height="440" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="193*"/>
@@ -28,6 +28,6 @@
                 <Label x:Name="lblStatus" Content="No Server Selected" Height="30" Width="300" Margin="0,20,0,0" VerticalAlignment="Top"/>
             </WrapPanel>
         </GroupBox>
-        <Label Content="v1.0.0" HorizontalAlignment="Right" Height="27" Margin="0,193,0,0" VerticalAlignment="Top" Width="47" Grid.Row="1"/>
+        <Label x:Name="versionLbl" Content="v1.0.0" HorizontalAlignment="Right" Height="27" Margin="0,193,0,0" VerticalAlignment="Top" Width="47" Grid.Row="1"/>
     </Grid>
 </Window>

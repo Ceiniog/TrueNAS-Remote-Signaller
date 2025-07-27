@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>1.0.1</Version>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
@@ -15,6 +16,14 @@
     <PublishTrimmed>false</PublishTrimmed>
     <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\splash_screen.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SplashScreen Include="Images\splash_screen.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Images\server_78355.ico" />
