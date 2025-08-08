@@ -1,7 +1,9 @@
-﻿using EasyWakeOnLan;
+﻿using ControlzEx.Standard;
+using EasyWakeOnLan;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -192,11 +194,7 @@ namespace TrueNASRemoteSignaller.Models {
 			}
 		}
 
-		public async Task<string> GetSystemState() {
-			if (!IsApiConfigured()) {
-				throw new Exception("This server has not been configured for API ineractions. Please ensure that the Base URI and API Key fields have been set.");
-			}
-
+		private async Task<string> _sendSystemStateReqAsync() {
 			string state;
 			if (IsUsingWebsocket()) {
 				using ClientWebSocket client = NetworkService.GetWebSocketClient();
@@ -232,6 +230,33 @@ namespace TrueNASRemoteSignaller.Models {
 			}
 
 			return state.Replace("\"", "");
+		}
+
+		public async Task<string> GetSystemState() {
+			string state;
+
+			if (!IsApiConfigured()) {
+				return "Unknown (API Not Configured)";
+			}
+
+			try {
+				state = await _sendSystemStateReqAsync(); // Get the state
+			}
+			catch(UnauthorizedAccessException) {
+				throw new UnauthorizedAccessException("No Connection (Auth Error)");
+			}
+			catch(TimeoutException) {
+				throw new TimeoutException("No Connection (Timed Out)");
+			}
+
+			catch(Exception) {
+				throw new Exception("No Connection");
+			}
+
+			TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
+			state = textInfo.ToTitleCase(state.ToLower().Replace("_", " ")); // Convert to title case
+
+			return state;
 		}
 
 		public bool IsApiConfigured() {

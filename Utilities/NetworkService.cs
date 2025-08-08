@@ -59,11 +59,8 @@ namespace TrueNASRemoteSignaller.Utilities {
 							throw new Exception($"Unknown request type {reqType}");
 					}
 				}
-				catch (TaskCanceledException ex) { // Handle timeout
-					if (ex.InnerException is TimeoutException || !ex.CancellationToken.IsCancellationRequested)
-						throw new TimeoutException($"Request timed out after {client.Timeout.TotalSeconds} seconds.");
-					else
-						throw new OperationCanceledException("Request was canceled.", ex);
+				catch (TaskCanceledException) { // Handle timeout
+					throw new TimeoutException($"Request timed out after {client.Timeout.TotalSeconds} seconds.");
 				}
 			}
 
@@ -73,8 +70,9 @@ namespace TrueNASRemoteSignaller.Utilities {
 				case HttpStatusCode.NotFound:
 					throw new Exception("API error: 404 - The requested endpoint was not found.");
 					break;
+				case HttpStatusCode.InternalServerError: // Truenas sends wrong error code it seems
 				case HttpStatusCode.Unauthorized:
-					throw new Exception("API error: 401 - Check your API key or server permissions.");
+					throw new UnauthorizedAccessException("API error: 401 - Check your API key or server permissions.");
 					break;
 				case HttpStatusCode.OK:
 					return await response.Content.ReadAsStringAsync();
@@ -136,18 +134,36 @@ namespace TrueNASRemoteSignaller.Utilities {
 			try {
 				var result = await client.ReceiveAsync(new ArraySegment<byte>(buffer), cts.Token);
 				string response = Encoding.UTF8.GetString(buffer, 0, result.Count);
-				Debug.WriteLine(response);
+				//Debug.WriteLine(response);
 
-				if (response.Contains("\"msg\":\"error\"")) {
-					throw new Exception($"WebSocket error response: {response}");
+				using var doc = JsonDocument.Parse(response);
+				var root = doc.RootElement;
+
+				// Check if it's a result message with an error
+				if (root.TryGetProperty("msg", out var msgProp) && msgProp.GetString() == "result" &&
+					root.TryGetProperty("error", out var errorObj)) {
+
+					int errorCode = errorObj.TryGetProperty("error", out var codeProp) ? codeProp.GetInt32() : -1;
+					string reason = errorObj.TryGetProperty("reason", out var reasonProp) ? reasonProp.GetString() ?? "No reason provided" : "No reason provided";
+
+					// Handle auth errors
+					if(errorCode == 207) {
+						throw new UnauthorizedAccessException("API auth error.");
+					}
+
+					throw new Exception(reason);
 				}
 
 				return response;
 			}
 			catch (OperationCanceledException) {
-				throw new TimeoutException("Timed out waiting for WebSocket response.");
+				throw new TimeoutException("Timed out.");
+			}
+			catch (JsonException ex) {
+				throw new Exception($"Unknown error. - Error parsing json response.");
 			}
 		}
+
 
 		public static async Task LogWebSocketResponsesAsync(ClientWebSocket client) {
 			var buffer = new byte[4096];

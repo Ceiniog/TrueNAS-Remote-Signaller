@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
         <GroupBox HorizontalAlignment="Center" Height="80" Header="Server Selection" Margin="0,10,0,0" VerticalAlignment="Top" Width="606" Background="White">
             <WrapPanel HorizontalAlignment="Left" Height="33" VerticalAlignment="Center" Width="577" Margin="8,0,0,0">
-                <ComboBox x:Name="comboServerSelect" DisplayMemberPath="ServerName" Height="25" Width="280" RenderTransformOrigin="0.541,0.622" Margin="0,0,20,0" Initialized="comboServerSelect_Initialized" SelectionChanged="comboServerSelect_SelectionChanged"/>
+                <ComboBox x:Name="comboServerSelect" DisplayMemberPath="ServerName" Height="25" Width="280" RenderTransformOrigin="0.541,0.622" Margin="0,0,20,0" Initialized="comboServerSelect_Initialized" SelectionChanged="comboServerSelect_SelectionChanged" SourceUpdated="comboServerSelect_SourceUpdated" TargetUpdated="comboServerSelect_TargetUpdated"/>
                 <Button x:Name="btnConfigureServer" Content="Configure" Height="33" Width="128" Margin="0,0,20,0" Click="btnConfigureServer_Click"/>
                 <Button x:Name="btnAddServer" Content="Add Server" Height="33" Width="128" Click="btnAddServer_Click"/>
             </WrapPanel>

@@ -60,33 +60,12 @@ namespace TrueNASRemoteSignaller.Windows {
 			}
 		}
 
-		public async Task UpdateStatusLabel() {
-			string status = "No Server Selected";
-			// Get status
-			if(SelectedInstance == null) {
-				status = "No Server Selected";
-			}
-			else {
-				if(SelectedInstance.IsApiConfigured()) {
-					try {
-						status = await SelectedInstance.GetSystemState(); // Get state from API
-						TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-						status = textInfo.ToTitleCase(status.ToLower().Replace("_", " ")); // Convert to title case
-					}
-					catch (Exception) {
-						status = "No Connection";
-					}
-				}
-				else {
-					status = "Unknown (API Not Configured)";
-				}
-			}
-
+		private void _updateStatusLabel(string status) {
 			// Update label
 			lblStatus.Content = status;
 
 			// Update label colour
-			switch(status.ToLower()) {
+			switch (status.ToLower()) {
 				case "ready":
 					lblStatus.Foreground = new SolidColorBrush(Colors.Green);
 					break;
@@ -94,18 +73,40 @@ namespace TrueNASRemoteSignaller.Windows {
 				case "error":
 				case "shutting down":
 				case "no connection":
+				case "no connection (timed out)":
+				case "no connection (auth error)":
 				case "failed":
 					lblStatus.Foreground = new SolidColorBrush(Colors.Red);
 					break;
 
 				case "booting":
-					lblStatus.Foreground = new SolidColorBrush(Colors.Yellow);
+				case "retrieving":
+					lblStatus.Foreground = new SolidColorBrush(Colors.Gold);
 					break;
 
 				default:
 					lblStatus.Foreground = new SolidColorBrush(Colors.Black);
 					break;
 			}
+		}
+
+		public async Task UpdateSelectedServerStatus() {
+			string status;
+
+			// Get status
+			if(SelectedInstance == null) {
+				status = "No Server Selected";
+			}
+			else {
+				try {
+					status = await SelectedInstance.GetSystemState();
+				}
+				catch (Exception ex) {
+					status = ex.Message;
+				}
+			}
+
+			_updateStatusLabel(status);
 		}
 
 		public bool IsConfigWindowOpen() {
@@ -169,7 +170,8 @@ namespace TrueNASRemoteSignaller.Windows {
 				btnConfigureServer.IsEnabled = true;
 			}
 
-			await UpdateStatusLabel();
+			_updateStatusLabel("Retrieving");
+			await UpdateSelectedServerStatus();
 		}
 
 		private void Button_Click(object sender, RoutedEventArgs e) {
@@ -198,7 +200,7 @@ namespace TrueNASRemoteSignaller.Windows {
 			}
 
 			MessageBox.Show("Shutdown request sent.", "Request Sent", MessageBoxButton.OK, MessageBoxImage.Information);
-			await UpdateStatusLabel();
+			await UpdateSelectedServerStatus();
 		}
 
 		private async void Button_Click_2(object sender, RoutedEventArgs e) {
@@ -213,7 +215,7 @@ namespace TrueNASRemoteSignaller.Windows {
 			}
 
 			MessageBox.Show("Restart request sent.", "Request Sent", MessageBoxButton.OK, MessageBoxImage.Information);
-			await UpdateStatusLabel();
+			await UpdateSelectedServerStatus();
 		}
 
 		private void Button_Click_3(object sender, RoutedEventArgs e) {
@@ -229,7 +231,7 @@ namespace TrueNASRemoteSignaller.Windows {
 
 		private async void Window_ContentRendered(object sender, EventArgs e) {
 			while(true) {
-				await UpdateStatusLabel();
+				await UpdateSelectedServerStatus();
 				await Task.Delay(10000); // Wait 10 seconds
 			}
 		}
@@ -243,6 +245,15 @@ namespace TrueNASRemoteSignaller.Windows {
 			}
 			*/
 		}
-		
+
+		private async void comboServerSelect_SourceUpdated(object sender, DataTransferEventArgs e) {
+			//comboServerSelect.SelectedItem = SelectedInstance ?? null;
+			//await UpdateSelectedServerStatus();
+		}
+
+		private async void comboServerSelect_TargetUpdated(object sender, DataTransferEventArgs e) {
+			//comboServerSelect.SelectedItem = SelectedInstance ?? null;
+			await UpdateSelectedServerStatus();
+		}
 	}
 }
