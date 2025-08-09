@@ -134,34 +134,43 @@ namespace TrueNASRemoteSignaller.Windows {
 			//_setTextValues();
 		}
 
-		private async void btnTestConnection_Click(object sender, RoutedEventArgs e) {
-			if(string.IsNullOrEmpty(txtAPIKey.Text) || string.IsNullOrEmpty(txtAPIEndpoint.Text)) {
+		private void btnTestConnection_Click(object sender, RoutedEventArgs e) {
+			if (string.IsNullOrEmpty(txtAPIKey.Text) || string.IsNullOrEmpty(txtAPIEndpoint.Text)) {
 				MessageBox.Show("API not configured. Please ensure that the API Key and Base URI fields have been set.", "Test Failed", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
 			}
 
-			// Create a test instance
-			ServerInstance testInstance = new ServerInstance("api-test");
-			testInstance.APIKey = ApiKeyProtector.Encrypt(txtAPIKey.Text.Trim());
-			testInstance.APIEndpoint = txtAPIEndpoint.Text.Trim();
-			testInstance.APIType = toggleAPIType.IsOn ? "WEBSOCKET" : "REST";
+			// Create and configure the test instance
+			ServerInstance testInstance = new ServerInstance("api-test") {
+				APIKey = ApiKeyProtector.Encrypt(txtAPIKey.Text.Trim()),
+				APIEndpoint = txtAPIEndpoint.Text.Trim(),
+				APIType = toggleAPIType.IsOn ? "WEBSOCKET" : "REST"
+			};
 
-			MessageBox.Show("Connection test started; results will be recieved in 10 seconds or less.", "Test Started", MessageBoxButton.OK, MessageBoxImage.Information);
+			// Run the test immediately in the background
+			Task.Run(async () => {
+				// Run test and output results
+				try {
+					await testInstance.GetSystemState();
 
-			try {
-				await testInstance.GetSystemState();
-			}
-			catch(TimeoutException) {
-				MessageBox.Show("Request timed out. No response from the server after 10 seconds.", "Test Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-				return;
-			}
-			catch (Exception ex) {
-				MessageBox.Show($"Test failed. Reason: {ex.Message}", "Test Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-				return;
-			}
+					// Notify success
+					Application.Current.Dispatcher.Invoke(() => {
+						MessageBox.Show("Connection established. The connection test was successful.", "Test Succeeded", MessageBoxButton.OK, MessageBoxImage.Information);
+					});
+				}
+				catch (TimeoutException) {
+					Application.Current.Dispatcher.Invoke(() => {
+						MessageBox.Show("Request timed out. No response from the server after 10 seconds.", "Test Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+					});
+				}
+				catch (Exception ex) {
+					Application.Current.Dispatcher.Invoke(() => {
+						MessageBox.Show($"Test failed. Reason: {ex.Message}", "Test Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+					});
+				}
+			});
 
-			MessageBox.Show("Conneciton established. The connection test was successful.", "Test Succeeded", MessageBoxButton.OK, MessageBoxImage.Information);
-
+			MessageBox.Show("Connection test started; results will be received in 10 seconds or less.", "Test Started", MessageBoxButton.OK, MessageBoxImage.Information);
 		}
-    }
+	}
 }
